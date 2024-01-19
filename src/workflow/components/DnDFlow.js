@@ -1,30 +1,31 @@
 import React, {
-  useState,
-  useRef,
   useCallback,
   useContext,
   useEffect,
+  useRef,
+  useState,
 } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import ReactFlow, {
-  ReactFlowProvider,
-  addEdge,
-  useNodesState,
-  useEdgesState,
   Controls,
   MiniMap,
+  ReactFlowProvider,
+  addEdge,
+  useEdgesState,
+  useNodesState,
 } from 'reactflow';
-import { Link } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 
+import { AppContext } from '../../AppContext';
 import Sidebar from '../../app/components/sidebar/Sidebar';
-import CsvReader from '../../app/components/CsvReader';
+import { ROUTES } from '../../common/constant';
+import CsvReader from './CsvReader';
 import DataTable from './DataTable';
 import Filter from './Filter';
-import { AppContext } from '../../AppContext';
-import { ROUTES } from '../../common/constant';
+import Sort from './Sort';
 
 const rfStyle = {
-  backgroundColor: '#B8CEFF',
+  backgroundColor: '#e1e9b7',
 };
 
 const initialNodes = [];
@@ -32,19 +33,19 @@ const initialNodes = [];
 const getId = () =>
   `dndnode_${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
-const nodeTypes = { filter: Filter, uploadCsv: CsvReader };
+const nodeTypes = { uploadCsv: CsvReader, filter: Filter, sort: Sort };
 
 const DnDFlow = ({ id }) => {
+  const history = useHistory();
   const { state, dispatch } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  // const [csvData, setCsvData] = useState([]);
   const [workflows, setWorkflows] = useState([]);
-  // const [connectedNodes, setConnectedNodes] = useState([]);
 
   useEffect(() => {
+    // eslint-disable-next-line no-undef
     const storedWorkflow = localStorage.getItem('workflows');
     const parsedWorkflow = JSON.parse(storedWorkflow);
     setWorkflows(storedWorkflow ? parsedWorkflow : []);
@@ -52,13 +53,14 @@ const DnDFlow = ({ id }) => {
 
   useEffect(() => {
     if (id) {
+      // eslint-disable-next-line no-undef
       const storedWorkflow = localStorage.getItem('workflows');
       const parsedWorkflow = JSON.parse(storedWorkflow);
       const workflowData = parsedWorkflow?.find(
-        (workflow) => workflow?.name === id
+        (workflow) => workflow?.name === id,
       );
 
-      if (workflowData) {
+      if (workflowData && workflowData?.nodes?.length > 0) {
         setNodes(workflowData?.nodes);
         setEdges(workflowData?.edges);
         dispatch({
@@ -67,7 +69,7 @@ const DnDFlow = ({ id }) => {
         });
         dispatch({
           type: 'SET_CSV_DATA',
-          data: workflowData?.connectedNodes?.[0]?.value,
+          data: workflowData?.connectedNodes?.[0]?.value || [],
         });
       }
     }
@@ -78,59 +80,52 @@ const DnDFlow = ({ id }) => {
     (connection) => {
       setEdges((eds) => addEdge(connection, eds));
 
-      const sourceNode = nodes.find((node) => node.id === connection.source);
-      const targetNode = nodes.find((node) => node.id === connection.target);
+      const sourceNode = nodes?.find((node) => node?.id === connection?.source);
+      const targetNode = nodes?.find((node) => node?.id === connection?.target);
 
       if (sourceNode || targetNode) {
         const connectedNodeData = {
-          id: targetNode.id,
-          type: targetNode.type,
-          value: targetNode.data.value,
+          id: targetNode?.id,
+          type: targetNode?.type,
+          value: targetNode?.data?.value,
         };
 
         const sourceNodeData = {
-          id: sourceNode.id,
-          type: sourceNode.type,
-          value: sourceNode.data.value,
+          id: sourceNode?.id,
+          type: sourceNode?.type,
+          value: sourceNode?.data?.value,
         };
 
-        if (state?.connectedNodes.length === 0) {
+        if (state?.connectedNodes?.length === 0) {
           dispatch({
             type: 'SET_CONNECTED_NODES',
             data: [sourceNodeData, connectedNodeData],
           });
-          // setConnectedNodes([sourceNodeData, connectedNodeData]);
           setNodes((prevNodes) => {
-            const updatedNodes = prevNodes.map((node) => {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  connectedNodes: [sourceNodeData, connectedNodeData],
-                },
-              };
-            });
+            const updatedNodes = prevNodes?.map((node) => ({
+              ...node,
+              data: {
+                ...node?.data,
+                connectedNodes: [sourceNodeData, connectedNodeData],
+              },
+            }));
 
             return updatedNodes;
           });
         } else {
-          // setConnectedNodes((prevConnectedNodes) => [
-          //   ...prevConnectedNodes,
-          //   connectedNodeData,
-          // ]);
           dispatch({
             type: 'SET_CONNECTED_NODES',
-            data: [...state.connectedNodes, connectedNodeData],
+            data: [...state?.connectedNodes, connectedNodeData],
           });
           setNodes((prevNodes) => {
-            const updatedNodes = prevNodes.map((node) => {
-              if (node.id === targetNode.id) {
+            const updatedNodes = prevNodes?.map((node) => {
+              if (node?.id === targetNode?.id) {
                 return {
                   ...node,
                   data: {
-                    ...node.data,
+                    ...node?.data,
                     connectedNodes: [
-                      ...(node.data.connectedNodes || []),
+                      ...(node?.data?.connectedNodes || []),
                       connectedNodeData,
                     ],
                   },
@@ -145,11 +140,12 @@ const DnDFlow = ({ id }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nodes]
+    [nodes],
   );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
+    // eslint-disable-next-line no-param-reassign
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
@@ -163,19 +159,7 @@ const DnDFlow = ({ id }) => {
         return;
       }
 
-      if (type === 'input' || type === 'output' || type === 'default') {
-        const position = reactFlowInstance.screenToFlowPosition({
-          x: event.clientX,
-          y: event.clientY,
-        });
-        const newNode = {
-          id: getId(),
-          type,
-          position,
-          data: { label: `${type} node` },
-        };
-        setNodes((nds) => nds.concat(newNode));
-      } else if (type === 'uploadCsv') {
+      if (type === 'uploadCsv') {
         const position = reactFlowInstance.screenToFlowPosition({
           x: event.clientX,
           y: event.clientY,
@@ -187,11 +171,10 @@ const DnDFlow = ({ id }) => {
           position,
           data: {
             label: <CsvReader />,
-            // setCsvData: setCsvData,
           },
         };
 
-        setNodes((nds) => nds.concat(newNode));
+        setNodes((nds) => nds?.concat(newNode));
       } else if (type === 'filter') {
         const position = reactFlowInstance.screenToFlowPosition({
           x: event.clientX,
@@ -204,9 +187,6 @@ const DnDFlow = ({ id }) => {
           position,
           data: {
             label: <Filter />,
-            // connectedNodes,
-            // setConnectedNodes,
-            // setCsvData,
             value: {
               column: '',
               filter: '',
@@ -215,10 +195,30 @@ const DnDFlow = ({ id }) => {
           },
         };
 
-        setNodes((nds) => nds.concat(newNode));
+        setNodes((nds) => nds?.concat(newNode));
+      } else if (type === 'sort') {
+        const position = reactFlowInstance.screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
+
+        const newNode = {
+          id: getId(),
+          type: 'sort',
+          position,
+          data: {
+            label: <Sort />,
+            value: {
+              column: '',
+              order: '',
+            },
+          },
+        };
+
+        setNodes((nds) => nds?.concat(newNode));
       }
     },
-    [reactFlowInstance, setNodes]
+    [reactFlowInstance, setNodes],
   );
 
   function generateUniqueWorkflowName() {
@@ -229,8 +229,18 @@ const DnDFlow = ({ id }) => {
 
   return (
     <>
-      <div className='d-flex justify-end mt-4 my-4 mx-4'>
+      <div className="d-flex justify-end mt-4 my-4 mx-4">
+        {id && (
+          <button
+            type="submit"
+            onClick={() => history.push(ROUTES?.WORKFLOWS)}
+            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-4 rounded"
+          >
+            Back
+          </button>
+        )}
         <button
+          type="submit"
           onClick={() => {
             if (id) {
               const result = workflows?.map((workflow) => {
@@ -245,8 +255,10 @@ const DnDFlow = ({ id }) => {
                 }
                 return workflow;
               });
+              // eslint-disable-next-line no-undef
               localStorage.setItem('workflows', JSON.stringify(result));
             } else {
+              // eslint-disable-next-line no-undef
               localStorage.setItem(
                 'workflows',
                 JSON.stringify([
@@ -258,24 +270,25 @@ const DnDFlow = ({ id }) => {
                     reactFlowInstance,
                     connectedNodes: state?.connectedNodes,
                   },
-                ])
+                ]),
               );
             }
+            history.push(ROUTES?.WORKFLOWS);
           }}
-          className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
           Save Workflow
         </button>
         <Link
           to={ROUTES?.WORKFLOWS}
-          className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 mx-8 rounded-full'
+          className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 mx-8 rounded-full"
         >
-          View Workflow
+          View Workflows
         </Link>
       </div>
-      <div className='dndflow'>
+      <div className="dndflow">
         <ReactFlowProvider>
-          <div className='reactflow-wrapper' ref={reactFlowWrapper}>
+          <div className="reactflow-wrapper" ref={reactFlowWrapper}>
             <ReactFlow
               nodes={nodes}
               edges={edges}

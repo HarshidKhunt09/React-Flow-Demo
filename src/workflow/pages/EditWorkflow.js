@@ -1,5 +1,5 @@
 import React from 'react';
-import DnDFlow from './DnDFlow';
+import DnDFlow from '../components/DnDFlow';
 
 const EditWorkflow = (props) => {
   const { match: { params: { id } = {} } = {} } = props;
