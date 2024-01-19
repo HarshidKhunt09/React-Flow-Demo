@@ -1,0 +1,16 @@
+Name,Role,Location,Department,Project,Manager,Status,Country,Technology,Team
+John,Developer,New York,Engineering,ProjectA,Alice,Active,USA,React,TeamA
+Jane,Designer,San Francisco,Design,ProjectB,Bob,Inactive,USA,Sketch,TeamB
+Bob,Tester,Los Angeles,Quality Assurance,ProjectC,Alice,Active,USA,Jest,TeamC
+Alice,Project Manager,Chicago,Management,ProjectD,John,Active,USA,Agile,TeamD
+Charlie,Developer,Houston,Engineering,ProjectE,Jane,Inactive,USA,Angular,TeamA
+David,Designer,Miami,Design,ProjectF,Bob,Active,USA,Photoshop,TeamB
+Eve,Tester,Austin,Quality Assurance,ProjectG,Alice,Inactive,USA,Cypress,TeamC
+Frank,Project Manager,Dallas,Management,ProjectH,John,Active,USA,Scrum,TeamD
+Grace,Developer,Seattle,Engineering,ProjectI,Jane,Active,USA,Vue,TeamA
+Harry,Designer,Portland,Design,ProjectJ,Bob,Inactive,USA,Figma,TeamB
+Ivy,Tester,Denver,Quality Assurance,ProjectK,Alice,Active,USA,Selenium,TeamC
+Jack,Project Manager,Phoenix,Management,ProjectL,John,Inactive,USA,Kanban,TeamD
+Karen,Developer,San Diego,Engineering,ProjectM,Jane,Active,USA,Node.js,TeamA
+Leo,Designer,San Jose,Design,ProjectN,Bob,Active,USA,Illustrator,TeamB
+Mia,Tester,Sacramento,Quality Assurance,ProjectO,Alice,Inactive,USA,Jasmine,TeamC

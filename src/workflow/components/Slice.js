@@ -17,9 +17,6 @@ const Slice = ({ id, data, isConnectable }) => {
     initialValues?.value?.toIndex || state?.csvData?.length,
   );
 
-  // eslint-disable-next-line no-console
-  console.log(initialValues?.value?.fromIndex);
-
   useEffect(() => {
     if (doesExist && data?.connectedNodes) {
       setToIndex(state?.csvData?.length.toString());
