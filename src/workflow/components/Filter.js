@@ -114,11 +114,12 @@ const Filter = ({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className="node bg-gray-200 p-4 rounded">
+    <div className="node bg-gray-200 p-4 rounded min-w-[250px]">
       <Handle
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
+        className="w-2 h-2"
       />
       <h3>Filter</h3>
       <CustomSelect
@@ -136,7 +137,7 @@ const Filter = ({ id, data, isConnectable }) => {
       {selectedFilter !== options?.[0] && (
         <input
           type="text"
-          className="border border-gray-300 p-2 mt-2"
+          className="border border-gray-300 p-2 mt-2 w-full"
           placeholder="Enter value..."
           value={userInput}
           onChange={handleUserInputChange}
@@ -156,6 +157,7 @@ const Filter = ({ id, data, isConnectable }) => {
         position={Position.Bottom}
         id="b"
         isConnectable={isConnectable}
+        className="w-2 h-2"
       />
     </div>
   );

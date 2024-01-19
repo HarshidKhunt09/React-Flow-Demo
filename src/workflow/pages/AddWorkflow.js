@@ -1,6 +1,6 @@
 import React from 'react';
 import DnDFlow from '../components/DnDFlow';
 
-const Workflow = () => <DnDFlow />;
+const AddWorkflow = () => <DnDFlow />;
 
-export default Workflow;
+export default AddWorkflow;

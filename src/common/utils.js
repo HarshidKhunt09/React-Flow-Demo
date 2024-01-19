@@ -53,6 +53,14 @@ export const applyFilters = (filters, csvDetails) => {
         return 0;
       });
     }
+    if (filter?.type === 'slice') {
+      const { fromIndex, toIndex } = filter?.value || {};
+      // eslint-disable-next-line no-param-reassign
+      csvDetails = csvDetails?.slice(
+        parseInt(fromIndex, 10),
+        parseInt(toIndex, 10),
+      );
+    }
   });
   return csvDetails;
 };

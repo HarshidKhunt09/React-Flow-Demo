@@ -22,18 +22,20 @@ import { ROUTES } from '../../common/constant';
 import CsvReader from './CsvReader';
 import DataTable from './DataTable';
 import Filter from './Filter';
+import Slice from './Slice';
 import Sort from './Sort';
-
-const rfStyle = {
-  backgroundColor: '#e1e9b7',
-};
 
 const initialNodes = [];
 
 const getId = () =>
   `dndnode_${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
-const nodeTypes = { uploadCsv: CsvReader, filter: Filter, sort: Sort };
+const nodeTypes = {
+  uploadCsv: CsvReader,
+  filter: Filter,
+  sort: Sort,
+  slice: Slice,
+};
 
 const DnDFlow = ({ id }) => {
   const history = useHistory();
@@ -216,6 +218,26 @@ const DnDFlow = ({ id }) => {
         };
 
         setNodes((nds) => nds?.concat(newNode));
+      } else if (type === 'slice') {
+        const position = reactFlowInstance.screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
+
+        const newNode = {
+          id: getId(),
+          type: 'slice',
+          position,
+          data: {
+            label: <Slice />,
+            value: {
+              fromIndex: '',
+              toIndex: '',
+            },
+          },
+        };
+
+        setNodes((nds) => nds?.concat(newNode));
       }
     },
     [reactFlowInstance, setNodes],
@@ -298,8 +320,8 @@ const DnDFlow = ({ id }) => {
               onInit={setReactFlowInstance}
               onDrop={onDrop}
               onDragOver={onDragOver}
-              style={rfStyle}
               nodeTypes={nodeTypes}
+              className="bg-light-yellow"
             >
               <MiniMap />
               <Controls />

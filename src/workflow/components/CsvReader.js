@@ -28,7 +28,13 @@ const CsvReader = ({ data }) => {
   return (
     <div className="node bg-gray-200 p-4 rounded">
       <input type="file" accept=".csv" onChange={handleFileChange} />
-      <Handle type="source" position={Position.Bottom} id="b" isConnectable />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="b"
+        isConnectable
+        className="w-2 h-2"
+      />
     </div>
   );
 };

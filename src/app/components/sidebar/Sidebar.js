@@ -33,6 +33,13 @@ const Sidebar = () => {
       >
         Sort
       </div>
+      <div
+        className="dndnode input"
+        onDragStart={(event) => onDragStart(event, 'slice')}
+        draggable
+      >
+        Slice
+      </div>
     </aside>
   );
 };

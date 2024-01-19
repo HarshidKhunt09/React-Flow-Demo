@@ -108,11 +108,12 @@ const Sort = ({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className="node bg-gray-200 p-4 rounded">
+    <div className="node bg-gray-200 p-4 rounded min-w-[250px]">
       <Handle
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
+        className="w-2 h-2"
       />
       <h3>Sort</h3>
       <CustomSelect
@@ -141,6 +142,7 @@ const Sort = ({ id, data, isConnectable }) => {
         position={Position.Bottom}
         id="b"
         isConnectable={isConnectable}
+        className="w-2 h-2"
       />
     </div>
   );
